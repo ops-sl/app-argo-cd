@@ -4,6 +4,7 @@ metadata:
   labels:
     app: grafana
   name: grafana
+  namespace: default
 spec:
   replicas: 3
   selector:
@@ -15,5 +16,19 @@ spec:
         app: grafana
     spec:
       containers:
-      - image: grafana/grafana:latest
-        name: grafana
+      - name: grafana
+        image: grafana/grafana:latest
+        ports:
+        - containerPort: 3000  # Grafana default port
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 20
